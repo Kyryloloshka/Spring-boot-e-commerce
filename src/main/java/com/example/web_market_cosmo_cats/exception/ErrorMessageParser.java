@@ -4,6 +4,11 @@ import java.util.Map;
 
 public class ErrorMessageParser {
 
+	private static final String TYPE_PREFIX = "type `";
+	private static final String FROM_STRING_PREFIX = "from String \"";
+	private static final String QUOTE = "\"";
+	private static final String BACKTICK = "`";
+
 	public static ParseResult parseDeserializationError(String message) {
 		if (message == null) {
 			return new ParseResult("Invalid request body format.", Map.of());
@@ -63,39 +68,33 @@ public class ErrorMessageParser {
 	}
 
 	private static String extractFieldName(String message) {
-		int fromIndex = message.indexOf("from String \"");
-
-		if (fromIndex > 0) {
-			int start = fromIndex + "from String \"".length();
-			int end = message.indexOf("\"", start);
-
-			if (end > start) {
-				return message.substring(start, end);
-			}
+		int fromIndex = message.indexOf(FROM_STRING_PREFIX);
+		int start = fromIndex + FROM_STRING_PREFIX.length();
+		int end = message.indexOf(QUOTE, start);
+		
+		if (fromIndex <= 0 || end <= start) {
+			return null;
 		}
 
-		return null;
+		return message.substring(start, end);
 	}
 
 	private static String extractTypeName(String message) {
-		int typeIndex = message.indexOf("type `");
-
-		if (typeIndex > 0) {
-			int start = typeIndex + "type `".length();
-			int end = message.indexOf("`", start);
-
-			if (end > start) {
-				String fullType = message.substring(start, end);
-
-				if (fullType.contains(".")) {
-					return fullType.substring(fullType.lastIndexOf(".") + 1);
-				}
-
-				return fullType;
-			}
+		int typeIndex = message.indexOf(TYPE_PREFIX);
+		int start = typeIndex + TYPE_PREFIX.length();
+		int end = message.indexOf(BACKTICK, start);
+		
+		if (typeIndex <= 0 || end <= start) {
+			return "unknown type";
 		}
 
-		return "unknown type";
+		String fullType = message.substring(start, end);
+		
+		if (fullType.contains(".")) {
+			return fullType.substring(fullType.lastIndexOf(".") + 1);
+		}
+
+		return fullType;
 	}
 
 	private static String sanitizeMessage(String message) {
