@@ -12,6 +12,7 @@ public class CosmicWordValidator implements ConstraintValidator<CosmicWordCheck,
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		if (value == null)
 			return false;
+
 		return COSMIC.stream().anyMatch(word -> value.toLowerCase().contains(word));
 	}
 }

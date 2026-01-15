@@ -13,6 +13,8 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = CosmicWordValidator.class)
 public @interface CosmicWordCheck {
 	String message() default "Name must contain cosmic words";
+
 	Class<?>[] groups() default {};
+
 	Class<? extends Payload>[] payload() default {};
 }

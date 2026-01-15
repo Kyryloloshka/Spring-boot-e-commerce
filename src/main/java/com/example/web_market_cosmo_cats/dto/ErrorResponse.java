@@ -25,4 +25,18 @@ public class ErrorResponse {
 	private LocalDateTime timestamp;
 
 	private Map<String, String> errors;
+
+	public static ErrorResponse of(String type, String title, Integer status, String detail, String instance,
+			Map<String, String> errors) {
+		ErrorResponse response = new ErrorResponse();
+		response.type = type;
+		response.title = title;
+		response.status = status;
+		response.detail = detail;
+		response.instance = instance;
+		response.timestamp = LocalDateTime.now();
+		response.errors = (errors != null && !errors.isEmpty()) ? errors : null;
+
+		return response;
+	}
 }

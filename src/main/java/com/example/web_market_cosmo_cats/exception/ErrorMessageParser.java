@@ -12,6 +12,7 @@ public class ErrorMessageParser {
 		if (message.contains("Cannot deserialize value")) {
 			String detail = extractFieldErrorFromMessage(message);
 			Map<String, String> fieldErrors = extractFieldErrors(message);
+
 			return new ParseResult(detail, fieldErrors);
 		}
 
@@ -31,6 +32,7 @@ public class ErrorMessageParser {
 				Map<String, String> fieldErrors = extractFieldErrors(usefulPart);
 				return new ParseResult(detail, fieldErrors);
 			}
+
 			return new ParseResult("Invalid JSON format: " + sanitizeMessage(usefulPart), Map.of());
 		}
 
@@ -45,6 +47,7 @@ public class ErrorMessageParser {
 			return String.format("Invalid value for field '%s': expected %s, but received invalid format.", fieldName,
 					typeName);
 		}
+
 		return "Invalid request body format. Please check field types and values.";
 	}
 
@@ -61,29 +64,37 @@ public class ErrorMessageParser {
 
 	private static String extractFieldName(String message) {
 		int fromIndex = message.indexOf("from String \"");
+
 		if (fromIndex > 0) {
 			int start = fromIndex + "from String \"".length();
 			int end = message.indexOf("\"", start);
+
 			if (end > start) {
 				return message.substring(start, end);
 			}
 		}
+
 		return null;
 	}
 
 	private static String extractTypeName(String message) {
 		int typeIndex = message.indexOf("type `");
+
 		if (typeIndex > 0) {
 			int start = typeIndex + "type `".length();
 			int end = message.indexOf("`", start);
+
 			if (end > start) {
 				String fullType = message.substring(start, end);
+
 				if (fullType.contains(".")) {
 					return fullType.substring(fullType.lastIndexOf(".") + 1);
 				}
+
 				return fullType;
 			}
 		}
+
 		return "unknown type";
 	}
 
@@ -91,24 +102,7 @@ public class ErrorMessageParser {
 		if (message.length() > 200) {
 			return message.substring(0, 197) + "...";
 		}
+
 		return message;
-	}
-
-	public static class ParseResult {
-		private final String detail;
-		private final Map<String, String> fieldErrors;
-
-		public ParseResult(String detail, Map<String, String> fieldErrors) {
-			this.detail = detail;
-			this.fieldErrors = fieldErrors;
-		}
-
-		public String getDetail() {
-			return detail;
-		}
-
-		public Map<String, String> getFieldErrors() {
-			return fieldErrors;
-		}
 	}
 }

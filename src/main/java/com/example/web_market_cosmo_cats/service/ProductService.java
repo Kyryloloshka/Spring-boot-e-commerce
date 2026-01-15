@@ -22,17 +22,20 @@ public class ProductService {
 	public ProductResponse create(ProductRequest request) {
 		Product product = mapper.toEntity(request);
 		Product saved = repository.save(product);
+
 		return mapper.toResponse(saved);
 	}
 
 	public List<ProductResponse> getAll() {
 		List<Product> products = repository.findAll();
+
 		return mapper.toResponseList(products);
 	}
 
 	public ProductResponse getById(String id) {
 		Product product = repository.findById(id)
 				.orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
+
 		return mapper.toResponse(product);
 	}
 
@@ -46,13 +49,11 @@ public class ProductService {
 		existing.setCategory(request.getCategory());
 
 		Product updated = repository.save(existing);
+
 		return mapper.toResponse(updated);
 	}
 
 	public void delete(String id) {
-		if (!repository.findById(id).isPresent()) {
-			throw new ProductNotFoundException("Product not found with id: " + id);
-		}
 		repository.deleteById(id);
 	}
 }

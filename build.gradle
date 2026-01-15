@@ -42,7 +42,6 @@ tasks.named('test') {
 spotless {
 	java {
 		target 'src/**/*.java'
-		// Використовуємо Eclipse formatter замість google-java-format
 		eclipse()
 		removeUnusedImports()
 		trimTrailingWhitespace()

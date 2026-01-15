@@ -1,14 +1,15 @@
 package com.example.web_market_cosmo_cats.repository;
 
-import com.example.web_market_cosmo_cats.domain.Product;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.stereotype.Repository;
+
+import com.example.web_market_cosmo_cats.domain.Product;
 
 @Repository
 public class ProductRepository {
@@ -18,7 +19,9 @@ public class ProductRepository {
 		if (product.getId() == null) {
 			product.setId(UUID.randomUUID().toString());
 		}
+
 		storage.put(product.getId(), product);
+
 		return product;
 	}
 
