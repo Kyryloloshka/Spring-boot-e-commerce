@@ -49,7 +49,6 @@ class ProductRepositoryTest {
 		assertThat(result.get().getName()).isEqualTo("Test Product");
 	}
 
-
 	@Test
 	void findAll_ShouldReturnAllProducts() {
 		Product product1 = new Product();

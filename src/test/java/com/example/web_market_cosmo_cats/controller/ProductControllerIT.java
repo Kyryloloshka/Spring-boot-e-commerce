@@ -47,23 +47,17 @@ class ProductControllerIT {
 	@Test
 	void getAll_ShouldReturnEmptyList_WhenNoProductsExist() throws Exception {
 		// When & Then
-		mockMvc.perform(get(baseUrl))
-				.andExpect(status().isOk())
-				.andExpect(content().json("[]"));
+		mockMvc.perform(get(baseUrl)).andExpect(status().isOk()).andExpect(content().json("[]"));
 	}
 
 	@Test
 	void createAndGetAll_ShouldWorkTogether() throws Exception {
 		String productJson = objectMapper.writeValueAsString(validProductRequest);
 
-		mockMvc.perform(post(baseUrl)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(productJson))
+		mockMvc.perform(post(baseUrl).contentType(MediaType.APPLICATION_JSON).content(productJson))
 				.andExpect(status().isCreated());
 
-		mockMvc.perform(get(baseUrl))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").isArray())
+		mockMvc.perform(get(baseUrl)).andExpect(status().isOk()).andExpect(jsonPath("$").isArray())
 				.andExpect(jsonPath("$.length()").value(1));
 	}
 
@@ -71,47 +65,33 @@ class ProductControllerIT {
 	void create_ShouldReturnCreatedProduct_WhenValidRequest() throws Exception {
 		String productJson = objectMapper.writeValueAsString(validProductRequest);
 
-		mockMvc.perform(post(baseUrl)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(productJson))
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.name").value("Star Product"))
+		mockMvc.perform(post(baseUrl).contentType(MediaType.APPLICATION_JSON).content(productJson))
+				.andExpect(status().isCreated()).andExpect(jsonPath("$.name").value("Star Product"))
 				.andExpect(jsonPath("$.description").value("Amazing cosmic product"))
-				.andExpect(jsonPath("$.price").value(99.99))
-				.andExpect(jsonPath("$.category").value("Electronics"))
+				.andExpect(jsonPath("$.price").value(99.99)).andExpect(jsonPath("$.category").value("Electronics"))
 				.andExpect(jsonPath("$.id").exists());
 	}
-
-
 
 	@Test
 	void fullCrudScenario_ShouldWorkCorrectly() throws Exception {
 		String productJson = objectMapper.writeValueAsString(validProductRequest);
-		String createResponse = mockMvc.perform(post(baseUrl)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(productJson))
-				.andExpect(status().isCreated())
-				.andReturn().getResponse().getContentAsString();
+		String createResponse = mockMvc
+				.perform(post(baseUrl).contentType(MediaType.APPLICATION_JSON).content(productJson))
+				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
 
 		String productId = objectMapper.readTree(createResponse).get("id").asText();
 
-		mockMvc.perform(get(baseUrl + "/" + productId))
-				.andExpect(status().isOk())
+		mockMvc.perform(get(baseUrl + "/" + productId)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(productId));
 
 		ProductRequest updateRequest = new ProductRequest("Galaxy Updated", "Updated desc", 149.99, "Updated Cat");
 		String updateJson = objectMapper.writeValueAsString(updateRequest);
 
-		mockMvc.perform(put(baseUrl + "/" + productId)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(updateJson))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.name").value("Galaxy Updated"));
+		mockMvc.perform(put(baseUrl + "/" + productId).contentType(MediaType.APPLICATION_JSON).content(updateJson))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Galaxy Updated"));
 
-		mockMvc.perform(delete(baseUrl + "/" + productId))
-				.andExpect(status().isNoContent());
+		mockMvc.perform(delete(baseUrl + "/" + productId)).andExpect(status().isNoContent());
 
-		mockMvc.perform(get(baseUrl + "/" + productId))
-				.andExpect(status().isNotFound());
+		mockMvc.perform(get(baseUrl + "/" + productId)).andExpect(status().isNotFound());
 	}
 }
