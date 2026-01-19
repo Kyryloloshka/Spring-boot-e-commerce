@@ -2,19 +2,22 @@ package com.example.web_market_cosmo_cats.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 
 import com.example.web_market_cosmo_cats.domain.Product;
 import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
 import com.example.web_market_cosmo_cats.dto.Product.ProductResponse;
 
-@SpringBootTest
 class ProductMapperTest {
 
-	@Autowired
 	private ProductMapper mapper;
+
+	@BeforeEach
+	void setUp() {
+		mapper = Mappers.getMapper(ProductMapper.class);
+	}
 
 	@Test
 	void toEntity_ShouldMapAllFieldsCorrectly() {
