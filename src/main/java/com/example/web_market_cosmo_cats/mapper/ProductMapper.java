@@ -5,8 +5,8 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 import com.example.web_market_cosmo_cats.domain.Product;
-import com.example.web_market_cosmo_cats.dto.ProductRequest;
-import com.example.web_market_cosmo_cats.dto.ProductResponse;
+import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
+import com.example.web_market_cosmo_cats.dto.Product.ProductResponse;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {

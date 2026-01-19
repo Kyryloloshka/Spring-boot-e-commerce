@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.web_market_cosmo_cats.domain.Product;
-import com.example.web_market_cosmo_cats.dto.ProductRequest;
-import com.example.web_market_cosmo_cats.dto.ProductResponse;
+import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
+import com.example.web_market_cosmo_cats.dto.Product.ProductResponse;
 
 @SpringBootTest
 class ProductMapperTest {

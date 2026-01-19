@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.web_market_cosmo_cats.domain.Product;
-import com.example.web_market_cosmo_cats.dto.ProductRequest;
-import com.example.web_market_cosmo_cats.dto.ProductResponse;
+import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
+import com.example.web_market_cosmo_cats.dto.Product.ProductResponse;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {

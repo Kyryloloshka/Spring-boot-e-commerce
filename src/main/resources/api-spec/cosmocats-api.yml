@@ -92,6 +92,138 @@ paths:
         "204":
           description: Deleted
 
+  /api/carts:
+    get:
+      summary: Get all shopping carts
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CartResponse"
+        "403":
+          description: Feature not available
+
+    post:
+      summary: Create new shopping cart
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        "403":
+          description: Feature not available
+
+  /api/carts/{id}:
+    get:
+      summary: Get shopping cart by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        "404":
+          description: Cart not found
+        "403":
+          description: Feature not available
+
+    delete:
+      summary: Delete shopping cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "403":
+          description: Feature not available
+
+  /api/carts/{id}/clear:
+    put:
+      summary: Clear shopping cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cart cleared
+        "404":
+          description: Cart not found
+        "403":
+          description: Feature not available
+
+  /api/carts/{cartId}/items:
+    post:
+      summary: Add product to shopping cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddToCartRequest"
+      responses:
+        "200":
+          description: Product added to cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        "404":
+          description: Cart not found
+        "400":
+          description: Validation error
+        "403":
+          description: Feature not available
+
+  /api/carts/{cartId}/items/{productId}:
+    delete:
+      summary: Remove product from shopping cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product removed from cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        "403":
+          description: Feature not available
+
 components:
   schemas:
     ProductRequest:
@@ -126,4 +258,28 @@ components:
         price:
           type: number
         category:
+          type: string
+
+    CartResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        productIds:
+          type: array
+          items:
+            type: string
+        totalPrice:
+          type: number
+          minimum: 0
+        itemCount:
+          type: integer
+          minimum: 0
+
+    AddToCartRequest:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
           type: string

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.web_market_cosmo_cats.dto.ErrorResponse;
+import com.example.web_market_cosmo_cats.featureToggles.exception.FeatureNotAvailableException;
+import com.example.web_market_cosmo_cats.service.exceptions.CartNotFoundException;
 import com.example.web_market_cosmo_cats.service.exceptions.ProductNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,13 +40,27 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(errorResponse);
 	}
 
-	@ExceptionHandler(ProductNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleNotFound(ProductNotFoundException ex, HttpServletRequest request) {
+	@ExceptionHandler({ProductNotFoundException.class, CartNotFoundException.class})
+	public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex, HttpServletRequest request) {
 
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/product-not-found",
-				"Product Not Found", HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getRequestURI(), null);
+		String type = ex instanceof ProductNotFoundException ? "product" : "cart";
+		String title = type.equals("product") ? "Product Not Found" : "Cart Not Found";
+		String problemType = "https://example.com/problems/" + type + "-not-found";
+
+		ErrorResponse errorResponse = ErrorResponse.of(problemType, title, HttpStatus.NOT_FOUND.value(),
+				ex.getMessage(), request.getRequestURI(), null);
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+	}
+
+	@ExceptionHandler(FeatureNotAvailableException.class)
+	public ResponseEntity<ErrorResponse> handleFeatureNotAvailable(FeatureNotAvailableException ex,
+			HttpServletRequest request) {
+
+		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/feature-not-available",
+				"Feature Not Available", HttpStatus.FORBIDDEN.value(), ex.getMessage(), request.getRequestURI(), null);
+
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)

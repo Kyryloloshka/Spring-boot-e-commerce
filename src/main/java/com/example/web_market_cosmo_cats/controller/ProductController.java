@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.web_market_cosmo_cats.dto.ProductRequest;
-import com.example.web_market_cosmo_cats.dto.ProductResponse;
+import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
+import com.example.web_market_cosmo_cats.dto.Product.ProductResponse;
 import com.example.web_market_cosmo_cats.service.ProductService;
 
 import jakarta.validation.Valid;

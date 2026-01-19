@@ -1,4 +1,4 @@
-package com.example.web_market_cosmo_cats.dto;
+package com.example.web_market_cosmo_cats.dto.Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
