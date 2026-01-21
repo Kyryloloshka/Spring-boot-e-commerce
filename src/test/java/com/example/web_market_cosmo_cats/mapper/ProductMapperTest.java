@@ -2,6 +2,8 @@ package com.example.web_market_cosmo_cats.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -24,7 +26,7 @@ class ProductMapperTest {
 		ProductRequest request = new ProductRequest();
 		request.setName("Star Product");
 		request.setDescription("Amazing cosmic product");
-		request.setPrice(99.99);
+		request.setPrice(BigDecimal.valueOf(99.99));
 		request.setCategory("Electronics");
 
 		Product result = mapper.toEntity(request);
@@ -33,7 +35,7 @@ class ProductMapperTest {
 		assertThat(result.getId()).isNull(); // ID should not be set from request
 		assertThat(result.getName()).isEqualTo("Star Product");
 		assertThat(result.getDescription()).isEqualTo("Amazing cosmic product");
-		assertThat(result.getPrice()).isEqualTo(99.99);
+		assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(99.99));
 		assertThat(result.getCategory()).isEqualTo("Electronics");
 	}
 
@@ -43,7 +45,7 @@ class ProductMapperTest {
 		product.setId("123");
 		product.setName("Star Product");
 		product.setDescription("Amazing cosmic product");
-		product.setPrice(99.99);
+		product.setPrice(BigDecimal.valueOf(99.99));
 		product.setCategory("Electronics");
 
 		ProductResponse result = mapper.toResponse(product);
@@ -52,7 +54,7 @@ class ProductMapperTest {
 		assertThat(result.getId()).isEqualTo("123");
 		assertThat(result.getName()).isEqualTo("Star Product");
 		assertThat(result.getDescription()).isEqualTo("Amazing cosmic product");
-		assertThat(result.getPrice()).isEqualTo(99.99);
+		assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(99.99));
 		assertThat(result.getCategory()).isEqualTo("Electronics");
 	}
 }

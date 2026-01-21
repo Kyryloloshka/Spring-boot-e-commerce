@@ -7,12 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import com.example.web_market_cosmo_cats.featureToggles.exception.FeatureNotAvailableException;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("unit")
 @TestPropertySource(properties = "feature.shoppingCart.enabled=false")
 class CartServiceDisabledTest {
 

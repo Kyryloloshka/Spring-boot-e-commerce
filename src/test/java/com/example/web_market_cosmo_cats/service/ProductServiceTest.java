@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,21 +46,21 @@ class ProductServiceTest {
 		productRequest = new ProductRequest();
 		productRequest.setName("Star Product");
 		productRequest.setDescription("Amazing cosmic product");
-		productRequest.setPrice(99.99);
+		productRequest.setPrice(BigDecimal.valueOf(99.99));
 		productRequest.setCategory("Electronics");
 
 		product = new Product();
 		product.setId("123");
 		product.setName("Star Product");
 		product.setDescription("Amazing cosmic product");
-		product.setPrice(99.99);
+		product.setPrice(BigDecimal.valueOf(99.99));
 		product.setCategory("Electronics");
 
 		productResponse = new ProductResponse();
 		productResponse.setId("123");
 		productResponse.setName("Star Product");
 		productResponse.setDescription("Amazing cosmic product");
-		productResponse.setPrice(99.99);
+		productResponse.setPrice(BigDecimal.valueOf(99.99));
 		productResponse.setCategory("Electronics");
 	}
 
@@ -120,21 +121,21 @@ class ProductServiceTest {
 		ProductRequest updateRequest = new ProductRequest();
 		updateRequest.setName("Updated Product");
 		updateRequest.setDescription("Updated description");
-		updateRequest.setPrice(199.99);
+		updateRequest.setPrice(BigDecimal.valueOf(199.99));
 		updateRequest.setCategory("Updated Category");
 
 		Product updatedProduct = new Product();
 		updatedProduct.setId("123");
 		updatedProduct.setName("Updated Product");
 		updatedProduct.setDescription("Updated description");
-		updatedProduct.setPrice(199.99);
+		updatedProduct.setPrice(BigDecimal.valueOf(199.99));
 		updatedProduct.setCategory("Updated Category");
 
 		ProductResponse updatedResponse = new ProductResponse();
 		updatedResponse.setId("123");
 		updatedResponse.setName("Updated Product");
 		updatedResponse.setDescription("Updated description");
-		updatedResponse.setPrice(199.99);
+		updatedResponse.setPrice(BigDecimal.valueOf(199.99));
 		updatedResponse.setCategory("Updated Category");
 
 		when(repository.findById("123")).thenReturn(Optional.of(product));
@@ -146,7 +147,7 @@ class ProductServiceTest {
 		assertThat(result).isEqualTo(updatedResponse);
 		assertThat(product.getName()).isEqualTo("Updated Product");
 		assertThat(product.getDescription()).isEqualTo("Updated description");
-		assertThat(product.getPrice()).isEqualTo(199.99);
+		assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(199.99));
 		assertThat(product.getCategory()).isEqualTo("Updated Category");
 
 		verify(repository).findById("123");

@@ -2,6 +2,8 @@ package com.example.web_market_cosmo_cats.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,8 +31,8 @@ class CartServiceEnabledTest {
 
 		assertThat(cart).isNotNull();
 		assertThat(cart.getId()).isNotNull();
-		assertThat(cart.getProductIds()).isEmpty();
-		assertThat(cart.getTotalPrice()).isEqualTo(0.0);
+		assertThat(cart.getItems()).isEmpty();
+		assertThat(cart.getTotalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(cart.getItemCount()).isEqualTo(0);
 	}
 
@@ -42,7 +44,8 @@ class CartServiceEnabledTest {
 		var carts = cartService.getAllCarts();
 
 		assertThat(carts).isNotNull();
-		assertThat(carts).hasSize(2);
+		assertThat(carts).filteredOn(c -> c.getId().equals(cart1.getId()) || c.getId().equals(cart2.getId()))
+				.hasSize(2);
 		assertThat(carts.stream().map(CartResponse::getId)).contains(cart1.getId(), cart2.getId());
 	}
 
@@ -54,8 +57,8 @@ class CartServiceEnabledTest {
 
 		assertThat(found).isNotNull();
 		assertThat(found.getId()).isEqualTo(created.getId());
-		assertThat(found.getProductIds()).isEmpty();
-		assertThat(found.getTotalPrice()).isEqualTo(0.0);
+		assertThat(found.getItems()).isEmpty();
+		assertThat(found.getTotalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(found.getItemCount()).isEqualTo(0);
 	}
 
@@ -65,7 +68,7 @@ class CartServiceEnabledTest {
 		ProductRequest productRequest = new ProductRequest();
 		productRequest.setName("Star Product");
 		productRequest.setDescription("Test Description");
-		productRequest.setPrice(29.99);
+		productRequest.setPrice(BigDecimal.valueOf(29.99));
 		productRequest.setCategory("Test Category");
 
 		ProductResponse product = productService.create(productRequest);
@@ -77,8 +80,8 @@ class CartServiceEnabledTest {
 
 		assertThat(updated).isNotNull();
 		assertThat(updated.getId()).isEqualTo(cartId);
-		assertThat(updated.getProductIds()).contains(product.getId());
-		assertThat(updated.getTotalPrice()).isEqualTo(29.99);
+		assertThat(updated.getItems()).isNotEmpty();
+		assertThat(updated.getTotalPrice()).isEqualByComparingTo(BigDecimal.valueOf(29.99));
 		assertThat(updated.getItemCount()).isEqualTo(1);
 	}
 
@@ -88,7 +91,7 @@ class CartServiceEnabledTest {
 		ProductRequest productRequest = new ProductRequest();
 		productRequest.setName("Star Product");
 		productRequest.setDescription("Test Description");
-		productRequest.setPrice(29.99);
+		productRequest.setPrice(BigDecimal.valueOf(29.99));
 		productRequest.setCategory("Test Category");
 
 		ProductResponse product = productService.create(productRequest);
@@ -100,8 +103,8 @@ class CartServiceEnabledTest {
 		cartService.clearCart(cartId);
 
 		CartResponse cleared = cartService.getCart(cartId);
-		assertThat(cleared.getProductIds()).isEmpty();
-		assertThat(cleared.getTotalPrice()).isEqualTo(0.0);
+		assertThat(cleared.getItems()).isEmpty();
+		assertThat(cleared.getTotalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
 		assertThat(cleared.getItemCount()).isEqualTo(0);
 	}
 }

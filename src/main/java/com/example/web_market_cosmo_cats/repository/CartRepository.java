@@ -1,43 +1,17 @@
 package com.example.web_market_cosmo_cats.repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.web_market_cosmo_cats.domain.Cart;
 
 @Repository
-public class CartRepository {
-	private final Map<String, Cart> storage = new HashMap<>();
+public interface CartRepository extends JpaRepository<Cart, String> {
 
-	public Cart save(Cart cart) {
-		if (cart.getId() == null) {
-			cart.setId(UUID.randomUUID().toString());
-		}
-
-		storage.put(cart.getId(), cart);
-
-		return cart;
-	}
-
-	public Optional<Cart> findById(String id) {
-		return Optional.ofNullable(storage.get(id));
-	}
-
-	public List<Cart> findAll() {
-		return new ArrayList<>(storage.values());
-	}
-
-	public void deleteById(String id) {
-		storage.remove(id);
-	}
-
-	public boolean existsById(String id) {
-		return storage.containsKey(id);
-	}
+	@Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items WHERE c.id = :id")
+	Optional<Cart> findByIdWithItems(@Param("id") String id);
 }
