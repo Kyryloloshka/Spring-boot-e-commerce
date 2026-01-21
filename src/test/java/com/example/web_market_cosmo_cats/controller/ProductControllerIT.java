@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.example.web_market_cosmo_cats.dto.ProductRequest;
+import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest

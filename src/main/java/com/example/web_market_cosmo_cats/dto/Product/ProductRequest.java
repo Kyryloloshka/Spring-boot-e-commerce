@@ -1,4 +1,4 @@
-package com.example.web_market_cosmo_cats.dto;
+package com.example.web_market_cosmo_cats.dto.Product;
 
 import com.example.web_market_cosmo_cats.validation.CosmicWordCheck;
 import jakarta.validation.constraints.NotNull;
