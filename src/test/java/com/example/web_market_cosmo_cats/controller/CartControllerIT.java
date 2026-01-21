@@ -3,16 +3,25 @@ package com.example.web_market_cosmo_cats.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.hamcrest.Matchers.closeTo;
 
@@ -21,9 +30,24 @@ import com.example.web_market_cosmo_cats.dto.Product.ProductRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
+@ActiveProfiles("test")
+@Testcontainers
 @TestPropertySource(properties = "feature.shoppingCart.enabled=true")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CartControllerIT {
+
+	@Container
+	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15-alpine"))
+			.withDatabaseName("testdb").withUsername("test").withPassword("test");
+
+	@DynamicPropertySource
+	static void configureProperties(DynamicPropertyRegistry registry) {
+		postgres.start();
+		registry.add("spring.datasource.url", postgres::getJdbcUrl);
+		registry.add("spring.datasource.username", postgres::getUsername);
+		registry.add("spring.datasource.password", postgres::getPassword);
+		registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+	}
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -44,7 +68,7 @@ class CartControllerIT {
 		ProductRequest product1 = new ProductRequest();
 		product1.setName("Star Product 1");
 		product1.setDescription("Description 1");
-		product1.setPrice(29.99);
+		product1.setPrice(BigDecimal.valueOf(29.99));
 		product1.setCategory("Test Category");
 
 		String product1Json = objectMapper.writeValueAsString(product1);
@@ -56,7 +80,7 @@ class CartControllerIT {
 		ProductRequest product2 = new ProductRequest();
 		product2.setName("Cosmic Product 2");
 		product2.setDescription("Description 2");
-		product2.setPrice(15.50);
+		product2.setPrice(BigDecimal.valueOf(15.50));
 		product2.setCategory("Test Category");
 
 		String product2Json = objectMapper.writeValueAsString(product2);
@@ -74,7 +98,7 @@ class CartControllerIT {
 	@Test
 	void createCart_ShouldReturnCreatedCart() throws Exception {
 		mockMvc.perform(post(baseUrl)).andExpect(status().isCreated()).andExpect(jsonPath("$.id").exists())
-				.andExpect(jsonPath("$.productIds").isEmpty()).andExpect(jsonPath("$.totalPrice").value(0.0))
+				.andExpect(jsonPath("$.items").isEmpty()).andExpect(jsonPath("$.totalPrice").value(0.0))
 				.andExpect(jsonPath("$.itemCount").value(0));
 	}
 
@@ -94,7 +118,7 @@ class CartControllerIT {
 		String cartId = objectMapper.readTree(createResponse).get("id").asText();
 
 		mockMvc.perform(get(baseUrl + "/" + cartId)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(cartId)).andExpect(jsonPath("$.productIds").isEmpty())
+				.andExpect(jsonPath("$.id").value(cartId)).andExpect(jsonPath("$.items").isEmpty())
 				.andExpect(jsonPath("$.totalPrice").value(0.0)).andExpect(jsonPath("$.itemCount").value(0));
 	}
 
@@ -116,7 +140,7 @@ class CartControllerIT {
 		mockMvc.perform(
 				post(baseUrl + "/" + cartId + "/items").contentType(MediaType.APPLICATION_JSON).content(addJson))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(cartId))
-				.andExpect(jsonPath("$.productIds").isArray()).andExpect(jsonPath("$.productIds[0]").value(product1Id))
+				.andExpect(jsonPath("$.items").isArray()).andExpect(jsonPath("$.items.length()").value(1))
 				.andExpect(jsonPath("$.totalPrice").value(29.99)).andExpect(jsonPath("$.itemCount").value(1));
 	}
 
@@ -146,9 +170,8 @@ class CartControllerIT {
 
 		mockMvc.perform(put(baseUrl + "/" + cartId + "/clear")).andExpect(status().isNoContent());
 
-		mockMvc.perform(get(baseUrl + "/" + cartId)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.productIds").isEmpty()).andExpect(jsonPath("$.totalPrice").value(0.0))
-				.andExpect(jsonPath("$.itemCount").value(0));
+		mockMvc.perform(get(baseUrl + "/" + cartId)).andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty())
+				.andExpect(jsonPath("$.totalPrice").value(0.0)).andExpect(jsonPath("$.itemCount").value(0));
 	}
 
 	@Test
@@ -197,9 +220,8 @@ class CartControllerIT {
 		mockMvc.perform(put(baseUrl + "/" + cartId + "/clear")).andExpect(status().isNoContent());
 
 		// Verify cart is empty
-		mockMvc.perform(get(baseUrl + "/" + cartId)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.productIds").isEmpty()).andExpect(jsonPath("$.totalPrice").value(0.0))
-				.andExpect(jsonPath("$.itemCount").value(0));
+		mockMvc.perform(get(baseUrl + "/" + cartId)).andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty())
+				.andExpect(jsonPath("$.totalPrice").value(0.0)).andExpect(jsonPath("$.itemCount").value(0));
 
 		// Delete cart
 		mockMvc.perform(delete(baseUrl + "/" + cartId)).andExpect(status().isNoContent());

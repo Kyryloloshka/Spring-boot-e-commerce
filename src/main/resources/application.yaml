@@ -1,0 +1,38 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: space-cats-market
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5433/cosmo_cats_market
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-init-sql: SET NAMES 'UTF8'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    hibernate:
+      ddl-auto: update
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+application:
+  feature:
+    toggles:
+      shoppingCart.enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+application:
+  feature:
+    toggles:
+      shoppingCart.enabled: true
