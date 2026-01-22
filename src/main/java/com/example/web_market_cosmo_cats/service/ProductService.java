@@ -2,58 +2,17 @@ package com.example.web_market_cosmo_cats.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
-import com.example.web_market_cosmo_cats.domain.Product;
 import com.example.web_market_cosmo_cats.dto.ProductRequest;
 import com.example.web_market_cosmo_cats.dto.ProductResponse;
-import com.example.web_market_cosmo_cats.mapper.ProductMapper;
-import com.example.web_market_cosmo_cats.repository.ProductRepository;
-import com.example.web_market_cosmo_cats.service.exceptions.ProductNotFoundException;
 
-import lombok.RequiredArgsConstructor;
+public interface ProductService {
+	ProductResponse create(ProductRequest request);
 
-@Service
-@RequiredArgsConstructor
-public class ProductService {
-	private final ProductRepository repository;
-	private final ProductMapper mapper;
+	List<ProductResponse> getAll();
 
-	public ProductResponse create(ProductRequest request) {
-		Product product = mapper.toEntity(request);
-		Product saved = repository.save(product);
+	ProductResponse getById(String id);
 
-		return mapper.toResponse(saved);
-	}
+	ProductResponse update(String id, ProductRequest request);
 
-	public List<ProductResponse> getAll() {
-		List<Product> products = repository.findAll();
-
-		return mapper.toResponseList(products);
-	}
-
-	public ProductResponse getById(String id) {
-		Product product = repository.findById(id)
-				.orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
-
-		return mapper.toResponse(product);
-	}
-
-	public ProductResponse update(String id, ProductRequest request) {
-		Product existing = repository.findById(id)
-				.orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
-
-		existing.setName(request.getName());
-		existing.setDescription(request.getDescription());
-		existing.setPrice(request.getPrice());
-		existing.setCategory(request.getCategory());
-
-		Product updated = repository.save(existing);
-
-		return mapper.toResponse(updated);
-	}
-
-	public void delete(String id) {
-		repository.deleteById(id);
-	}
+	void delete(String id);
 }

@@ -1,9 +1,11 @@
 package com.example.web_market_cosmo_cats.exception;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.example.web_market_cosmo_cats.dto.ErrorResponse;
 import com.example.web_market_cosmo_cats.service.exceptions.ProductNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,
+	public ResponseEntity<ProblemDetail> handleValidation(MethodArgumentNotValidException ex,
 			HttpServletRequest request) {
 
 		Map<String, String> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
@@ -30,56 +31,61 @@ public class GlobalExceptionHandler {
 								: "Validation failed",
 						(existing, replacement) -> existing + "; " + replacement));
 
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/validation-error",
-				"Validation Failed", HttpStatus.BAD_REQUEST.value(),
-				"The request contains validation errors. Please check the 'errors' field for details.",
-				request.getRequestURI(), fieldErrors);
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+				"The request contains validation errors. Please check the errors field for details.");
+		problemDetail.setType(URI.create("https://example.com/problems/validation-error"));
+		problemDetail.setTitle("Validation Failed");
+		problemDetail.setInstance(URI.create(request.getRequestURI()));
+		problemDetail.setProperty("errors", fieldErrors);
 
-		return ResponseEntity.badRequest().body(errorResponse);
+		return ResponseEntity.badRequest().body(problemDetail);
 	}
 
 	@ExceptionHandler(ProductNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleNotFound(ProductNotFoundException ex, HttpServletRequest request) {
+	public ResponseEntity<ProblemDetail> handleNotFound(ProductNotFoundException ex, HttpServletRequest request) {
 
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/product-not-found",
-				"Product Not Found", HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getRequestURI(), null);
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+		problemDetail.setType(URI.create("https://example.com/problems/product-not-found"));
+		problemDetail.setTitle("Product Not Found");
+		problemDetail.setInstance(URI.create(request.getRequestURI()));
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+	public ResponseEntity<ProblemDetail> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpServletRequest request) {
 
-		Throwable cause = ex.getCause();
-		String message = (cause != null && cause.getMessage() != null) ? cause.getMessage() : ex.getMessage();
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+				"Invalid JSON format. Please check your request body syntax.");
+		problemDetail.setType(URI.create("https://example.com/problems/invalid-request-body"));
+		problemDetail.setTitle("Invalid Request Body");
+		problemDetail.setInstance(URI.create(request.getRequestURI()));
 
-		ParseResult parseResult = ErrorMessageParser.parseDeserializationError(message);
-
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/invalid-request-body",
-				"Invalid Request Body", HttpStatus.BAD_REQUEST.value(), parseResult.detail(), request.getRequestURI(),
-				parseResult.fieldErrors());
-
-		return ResponseEntity.badRequest().body(errorResponse);
+		return ResponseEntity.badRequest().body(problemDetail);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
+	public ResponseEntity<ProblemDetail> handleIllegalArgument(IllegalArgumentException ex,
 			HttpServletRequest request) {
 
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/invalid-argument",
-				"Invalid Argument", HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getRequestURI(), null);
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+		problemDetail.setType(URI.create("https://example.com/problems/invalid-argument"));
+		problemDetail.setTitle("Invalid Argument");
+		problemDetail.setInstance(URI.create(request.getRequestURI()));
 
-		return ResponseEntity.badRequest().body(errorResponse);
+		return ResponseEntity.badRequest().body(problemDetail);
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
+	public ResponseEntity<ProblemDetail> handleGenericException(Exception ex, HttpServletRequest request) {
 
-		ErrorResponse errorResponse = ErrorResponse.of("https://example.com/problems/internal-server-error",
-				"Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				"An unexpected error occurred: " + ex.getMessage(), request.getRequestURI(), null);
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+				"An unexpected error occurred: " + ex.getMessage());
+		problemDetail.setType(URI.create("https://example.com/problems/internal-server-error"));
+		problemDetail.setTitle("Internal Server Error");
+		problemDetail.setInstance(URI.create(request.getRequestURI()));
 
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
 	}
 }
