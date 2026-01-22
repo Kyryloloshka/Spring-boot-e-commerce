@@ -71,7 +71,7 @@ public class ErrorMessageParser {
 		int fromIndex = message.indexOf(FROM_STRING_PREFIX);
 		int start = fromIndex + FROM_STRING_PREFIX.length();
 		int end = message.indexOf(QUOTE, start);
-		
+
 		if (fromIndex <= 0 || end <= start) {
 			return null;
 		}
@@ -83,13 +83,13 @@ public class ErrorMessageParser {
 		int typeIndex = message.indexOf(TYPE_PREFIX);
 		int start = typeIndex + TYPE_PREFIX.length();
 		int end = message.indexOf(BACKTICK, start);
-		
+
 		if (typeIndex <= 0 || end <= start) {
 			return "unknown type";
 		}
 
 		String fullType = message.substring(start, end);
-		
+
 		if (fullType.contains(".")) {
 			return fullType.substring(fullType.lastIndexOf(".") + 1);
 		}

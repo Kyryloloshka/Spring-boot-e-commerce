@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/v1/api/products")
 @RequiredArgsConstructor
 public class ProductController {
 	private final ProductService service;
