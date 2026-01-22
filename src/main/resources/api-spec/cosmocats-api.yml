@@ -4,7 +4,7 @@ info:
   version: 1.0.0
 
 paths:
-  /api/products:
+  /v1/api/products:
     get:
       summary: Get all products
       responses:
@@ -35,15 +35,9 @@ paths:
         "400":
           description: Validation error
 
-  /api/products/{id}:
-    get:
-      summary: Get product by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+  /v1/api/products/{id}:
+    schema:
+      type: string
       responses:
         "200":
           description: Success
